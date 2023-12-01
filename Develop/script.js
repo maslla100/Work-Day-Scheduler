@@ -1,79 +1,66 @@
-< !DOCTYPE html >
-    <html lang="en">
-        <head>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-            <link
-                href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-                rel="stylesheet"
-                integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-                crossorigin="anonymous"
-            />
-            <link
-                rel="stylesheet"
-                href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-                integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
-                crossorigin="anonymous"
-            />
-            <link
-                href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;700&display=swap"
-                rel="stylesheet"
-            />
-            <link rel="stylesheet" href="style.css" />
-            <title>Work Day Scheduler</title>
-        </head>
+$(function () {
+    // Display the current date in the header
+    function displayCurrentDate() {
+        $('#currentDay').text(dayjs().format('dddd, MMMM D'));
+    }
 
-        <body>
-            <header class="p-5 mb-4">
-                <h1 class="display-3">Work Day Scheduler</h1>
-                <p class="lead">A simple calendar app for scheduling your work day</p>
-                <p id="currentDay" class="lead"></p>
-            </header>
-            <div class="container-fluid px-5">
-                <!-- Use class for "past", "present", and "future" to apply styles to the
-                time-block divs accordingly. The javascript will need to do this by
-                adding/removing these classes on each div by comparing the hour in the
-                id to the current hour. The html provided below is meant to be an example
-                demonstrating how the css provided can be leveraged to create the
-                desired layout and colors. The html below should be removed or updated
-                in the finished product. Remember to delete this comment once the
-                code is implemented.
-        -->
+    // Apply the past, present, or future class to each time block
+    function updateBlockClasses() {
+        const currentHour = dayjs().hour(); // Get current hour in 24-hour format
+        $('.time-block').each(function () {
+            const blockHour = parseInt($(this).attr('id').replace('hour-', ''));
+            $(this).removeClass('past present future');
+            if (blockHour < currentHour) {
+                $(this).addClass('past');
+            } else if (blockHour === currentHour) {
+                $(this).addClass('present');
+            } else {
+                $(this).addClass('future');
+            }
+        });
+    }
 
-                <!-- Example of a past time block. The "past" class adds a gray background color. -->
-                <div id="hour-9" class="row time-block past">
-                    <div class="col-2 col-md-1 hour text-center py-3">9AM</div>
-                    <textarea class="col-8 col-md-10 description" rows="3"> </textarea>
-                    <button class="btn saveBtn col-2 col-md-1" aria-label="save">
-                        <i class="fas fa-save" aria-hidden="true"></i>
+    // Get user input from localStorage and set values of corresponding textareas
+    function loadSavedEvents() {
+        $('.time-block').each(function () {
+            const id = $(this).attr('id');
+            const savedText = localStorage.getItem(id) || '';
+            $(this).find('.description').val(savedText);
+        });
+    }
+
+    // Generate time blocks for business hours (9 AM to 5 PM)
+    function generateTimeBlocks() {
+        const workHours = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+        workHours.forEach(hour => {
+            const formattedHour = hour <= 12 ? `${hour}AM` : `${hour - 12}PM`;
+            $('#timeBlockContainer').append(`
+                <div id="hour-${hour}" class="row time-block">
+                    <div class="col-2 col-md-1 hour text-center py-3">${formattedHour}</div>
+                    <textarea class="col-8 col-md-10 description" rows="3"></textarea>
+                    <button class="btn saveBtn col-2 col-md-1">
+                        <i class="fas fa-save"></i>
                     </button>
                 </div>
+            `);
+        });
+    }
 
-                <!-- Example of a present time block. The "present" class adds a red background color. -->
-                <div id="hour-10" class="row time-block present">
-                    <div class="col-2 col-md-1 hour text-center py-3">10AM</div>
-                    <textarea class="col-8 col-md-10 description" rows="3"> </textarea>
-                    <button class="btn saveBtn col-2 col-md-1" aria-label="save">
-                        <i class="fas fa-save" aria-hidden="true"></i>
-                    </button>
-                </div>
+    // Save button click event listener
+    $('#timeBlockContainer').on('click', '.saveBtn', function () {
+        const timeBlock = $(this).closest('.time-block');
+        const id = timeBlock.attr('id');
+        const text = timeBlock.find('.description').val();
+        localStorage.setItem(id, text);
+    });
 
-                <!-- Example of a future time block. The "future" class adds a green background color. -->
-                <div id="hour-11" class="row time-block future">
-                    <div class="col-2 col-md-1 hour text-center py-3">11AM</div>
-                    <textarea class="col-8 col-md-10 description" rows="3"> </textarea>
-                    <button class="btn saveBtn col-2 col-md-1" aria-label="save">
-                        <i class="fas fa-save" aria-hidden="true"></i>
-                    </button>
-                </div>
-            </div>
+    // Initialize the scheduler
+    function initializeScheduler() {
+        displayCurrentDate();
+        generateTimeBlocks();
+        loadSavedEvents();
+        updateBlockClasses();
+    }
 
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.3/dayjs.min.js"
-                integrity="sha256-iu/zLUB+QgISXBLCW/mcDi/rnf4m4uEDO0wauy76x7U="
-                crossorigin="anonymous"></script>
-
-            <script src="script.js"></script>
-        </body>
-    </html>
+    initializeScheduler();
+});

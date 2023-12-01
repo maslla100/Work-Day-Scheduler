@@ -1,6 +1,8 @@
 body {
     font-family: 'Open Sans', sans-serif;
     font-size: 16px;
+    background-color: #f4f4f4;
+    /* Optional: added a light background color */
 }
 
 textarea {
@@ -10,6 +12,16 @@ textarea {
     color: #000000;
     border-left: 1px solid black;
     padding: 10px;
+    /* Added focus style for better user interaction */
+    outline: none;
+    /* Removes default outline */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    /* Subtle shadow on focus */
+}
+
+textarea:focus {
+    border-left: 2px solid #06aed5;
+    /* Highlight on focus */
 }
 
 .description {
@@ -18,10 +30,13 @@ textarea {
 
 .time-block {
     border-radius: 15px;
+    margin-bottom: 10px;
+    /* Added space between blocks */
 }
 
 .row {
-    border-top: 1px solid white;
+    border-top: 1px solid #ddd;
+    /* Adjusted for visibility */
 }
 
 .hour {
@@ -51,9 +66,25 @@ textarea {
     border-bottom-right-radius: 15px;
     background-color: #06aed5;
     color: white;
+    cursor: pointer;
+    /* Indicates the button is clickable */
 }
 
 .saveBtn i:hover {
     font-size: 20px;
     transition: all 0.3s ease-in-out;
+}
+
+/* Responsive Design Adjustments */
+@media screen and (max-width: 768px) {
+
+    .hour,
+    .saveBtn {
+        font-size: 14px;
+        /* Adjust font size for smaller screens */
+    }
+
+    .description {
+        font-size: 14px;
+    }
 }
